@@ -84,10 +84,10 @@ public class Assignment2 {
 			// Second step: Create Datacenters
 			// Datacenters are the resource providers in CloudSim. We need at
 			// list one of them to run a CloudSim simulation
-			Datacenter datacenter0 = createDatacenter("Datacenter_0");
+			PowerDatacenter datacenter0 = createDatacenter("Datacenter_0");
 
 			// Third step: Create Broker
-			DatacenterBroker broker = createBroker();
+			PowerDatacenterBroker broker = createBroker();
 			int brokerId = broker.getId();
 
 			
@@ -154,7 +154,7 @@ public class Assignment2 {
 	 *
 	 * @return the datacenter
 	 */
-	private static Datacenter createDatacenter(String name) {
+	private static PowerDatacenter createDatacenter(String name) {
 
 		// Here are the steps needed to create a PowerDatacenter:
 		// 1. We need to create a list to store
@@ -210,7 +210,7 @@ public class Assignment2 {
 				costPerStorage, costPerBw);
 
 		// 6. Finally, we need to create a PowerDatacenter object.
-		Datacenter datacenter = null;
+		PowerDatacenter datacenter = null;
 		try {
 			datacenter = new PowerDatacenter(name, characteristics, new PowerVmAllocationPolicySimple(hostList), storageList, 0);
 		} catch (Exception e) {
@@ -228,8 +228,8 @@ public class Assignment2 {
 	 *
 	 * @return the datacenter broker
 	 */
-	private static DatacenterBroker createBroker() {
-		DatacenterBroker broker = null;
+	private static PowerDatacenterBroker createBroker() {
+		PowerDatacenterBroker broker = null;
 		try {
 			broker = new PowerDatacenterBroker("Broker");
 		} catch (Exception e) {
