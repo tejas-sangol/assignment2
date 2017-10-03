@@ -103,7 +103,7 @@ public class Assignment2 {
 			// create 4000 VM and add to the list
 			vmlist = new ArrayList<PowerVm>();
 
-			generateVms(vmlist,1000000,10,10,10,10,brokerId);
+			generateVms(vmlist,10000,1,0,0,0,brokerId);
 
 			// submit vm list to the broker
 			broker.submitVmList(vmlist);
@@ -113,7 +113,7 @@ public class Assignment2 {
 
 			// Cloudlet properties
 			int id = 0;
-			long length = 4000;
+			long length = 400000000;
 			long fileSize = 300;
 			long outputSize = 300;
 			UtilizationModel utilizationModel = new UtilizationModelFull();
@@ -161,23 +161,21 @@ public class Assignment2 {
 		// our machine
 		List<PowerHost> hostList = new ArrayList<PowerHost>();
 
-		// 2. A Machine contains one or more PEs or CPUs/Cores.
-		// In this example, it will have only one core.
-		List<Pe> peList = new ArrayList<Pe>();
+		for(int i=0;i<1;i++)
+		{
+			List<Pe> peList = new ArrayList<Pe>();
 
-		int mips = 10000000;
+			int mips = 1000;
 
-		// 3. Create PEs and add these into a list.
-		peList.add(new Pe(0, new PeProvisionerSimple(mips))); // need to store Pe id and MIPS Rating
+			// 3. Create PEs and add these into a list.
+			peList.add(new Pe(0, new PeProvisionerSimple(mips))); 
 
-		// 4. Create PowerHost with its id and list of PEs and add them to the list
-		// of machines
-		int hostId = 0;
-		int ram = 204800; // host memory (MB)
-		long storage = 1000000; // host storage
-		int bw = 1000000;
+			int hostId = i;
+			int ram = 2048; // host memory (MB)
+			long storage = 1000000; // host storage
+			int bw = 1000000;
 
-		hostList.add(
+			hostList.add(
 			new PowerHost(
 				hostId,
 				new RamProvisionerSimple(ram),
@@ -187,7 +185,13 @@ public class Assignment2 {
 				new VmSchedulerTimeShared(peList),
 				new PowerModelLinear(10000,0.1)
 			)
-		); // This is our machine
+			);
+
+			// System.out.println(hostList.size());
+		}
+		// 2. A Machine contains one or more PEs or CPUs/Cores.
+		// In this example, it will have only one core.
+		
 
 		// 5. Create a DatacenterCharacteristics object that stores the
 		// properties of a data center: architecture, OS, list of
@@ -212,7 +216,7 @@ public class Assignment2 {
 		// 6. Finally, we need to create a PowerDatacenter object.
 		PowerDatacenter datacenter = null;
 		try {
-			datacenter = new PowerDatacenter(name, characteristics, new PowerVmAllocationPolicySimple(hostList), storageList, 0);
+			datacenter = new PowerDatacenter(name, characteristics, new PowerVmAllocationPolicySimple(hostList), storageList, 0.01);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -277,7 +281,7 @@ public class Assignment2 {
 	private static void generateVms(List<PowerVm> vmlist,int totalMips,int countMicro, int countSmall, int countMedium, int countLarge, int brokerId)
 	{
 		int vmid = 0;
-		int microMips = 1000;
+		int microMips = (totalMips / 100)* 10;
 		int smallMips = (totalMips / 100)* 20;
 		int mediumMips = (totalMips / 100)* 30;
 		int largeMips = (totalMips / 100)* 40;
