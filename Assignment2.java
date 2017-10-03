@@ -16,14 +16,15 @@ import java.util.List;
 
 import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
-// import org.cloudbus.cloudsim.Datacenter;
-// import org.cloudbus.cloudsim.DatacenterBroker;
-import org.cloudbus.cloudsim.power.PowerDatacenter;
-import org.cloudbus.cloudsim.power.PowerDatacenterBroker;
+import org.cloudbus.cloudsim.Datacenter;
+import org.cloudbus.cloudsim.DatacenterBroker;
+// import org.cloudbus.cloudsim.power.Datacenter;
+// import org.cloudbus.cloudsim.power.DatacenterBroker;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
 import org.cloudbus.cloudsim.power.PowerHost;
 import org.cloudbus.cloudsim.Log;
 import org.cloudbus.cloudsim.Pe;
+import org.cloudbus.cloudsim.Vm;
 import org.cloudbus.cloudsim.Storage;
 import org.cloudbus.cloudsim.UtilizationModel;
 import org.cloudbus.cloudsim.UtilizationModelFull;
@@ -43,7 +44,10 @@ public class Assignment2 {
 	/** The cloudlet list. */
 	private static List<Cloudlet> cloudletList;
 	/** The vmlist. */
-	private static List<PowerVm> vmlist;
+	private static List<Vm> vmlist;
+
+
+
 
 	/**
 	 * Creates main() to run this example.
@@ -84,10 +88,13 @@ public class Assignment2 {
 			// Second step: Create Datacenters
 			// Datacenters are the resource providers in CloudSim. We need at
 			// list one of them to run a CloudSim simulation
-			PowerDatacenter datacenter0 = createDatacenter("Datacenter_0");
+
+			List<PowerHost> hostList = Helper.createHostList(10);
+
+			Datacenter datacenter0 = Helper.createDatacenter("Datacenter_0",Datacenter.class,hostList,new PowerVmAllocationPolicySimple(hostList));
 
 			// Third step: Create Broker
-			PowerDatacenterBroker broker = createBroker();
+			DatacenterBroker broker = Helper.createBroker();
 			int brokerId = broker.getId();
 
 			
@@ -101,9 +108,7 @@ public class Assignment2 {
 			String vmm = "Xen"; // VMM name
 
 			// create 4000 VM and add to the list
-			vmlist = new ArrayList<PowerVm>();
-
-			generateVms(vmlist,10000,1,0,0,0,brokerId);
+			vmlist = Helper.createVmList(brokerId,1);
 
 			// submit vm list to the broker
 			broker.submitVmList(vmlist);
@@ -113,7 +118,7 @@ public class Assignment2 {
 
 			// Cloudlet properties
 			int id = 0;
-			long length = 400000000;
+			long length = 4000000;
 			long fileSize = 300;
 			long outputSize = 300;
 			UtilizationModel utilizationModel = new UtilizationModelFull();
@@ -154,9 +159,9 @@ public class Assignment2 {
 	 *
 	 * @return the datacenter
 	 */
-	private static PowerDatacenter createDatacenter(String name) {
+	private static Datacenter createDatacenter(String name) {
 
-		// Here are the steps needed to create a PowerDatacenter:
+		// Here are the steps needed to create a Datacenter:
 		// 1. We need to create a list to store
 		// our machine
 		List<PowerHost> hostList = new ArrayList<PowerHost>();
@@ -168,12 +173,12 @@ public class Assignment2 {
 			int mips = 1000;
 
 			// 3. Create PEs and add these into a list.
-			peList.add(new Pe(0, new PeProvisionerSimple(mips))); 
+			peList.add(new Pe(i, new PeProvisionerSimple(mips))); 
 
 			int hostId = i;
 			int ram = 2048; // host memory (MB)
 			long storage = 1000000; // host storage
-			int bw = 1000000;
+			int bw = 10000;
 
 			hostList.add(
 			new PowerHost(
@@ -213,10 +218,10 @@ public class Assignment2 {
 				arch, os, vmm, hostList, time_zone, cost, costPerMem,
 				costPerStorage, costPerBw);
 
-		// 6. Finally, we need to create a PowerDatacenter object.
-		PowerDatacenter datacenter = null;
+		// 6. Finally, we need to create a Datacenter object.
+		Datacenter datacenter = null;
 		try {
-			datacenter = new PowerDatacenter(name, characteristics, new PowerVmAllocationPolicySimple(hostList), storageList, 0.01);
+			datacenter = new Datacenter(name, characteristics, new PowerVmAllocationPolicySimple(hostList), storageList, 0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -232,10 +237,10 @@ public class Assignment2 {
 	 *
 	 * @return the datacenter broker
 	 */
-	private static PowerDatacenterBroker createBroker() {
-		PowerDatacenterBroker broker = null;
+	private static DatacenterBroker createBroker() {
+		DatacenterBroker broker = null;
 		try {
-			broker = new PowerDatacenterBroker("Broker");
+			broker = new DatacenterBroker("Broker");
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -278,44 +283,44 @@ public class Assignment2 {
 		}
 	}
 
-	private static void generateVms(List<PowerVm> vmlist,int totalMips,int countMicro, int countSmall, int countMedium, int countLarge, int brokerId)
-	{
-		int vmid = 0;
-		int microMips = (totalMips / 100)* 10;
-		int smallMips = (totalMips / 100)* 20;
-		int mediumMips = (totalMips / 100)* 30;
-		int largeMips = (totalMips / 100)* 40;
-		long size = 10000; // image size (MB)
-		int ram = 512; // vm memory (MB)
-		long bw = 1000;
-		int pesNumber = 1; // number of cpus
-		String vmm = "Xen"; // VMM name
+	// private static void generateVms(List<PowerVm> vmlist,int totalMips,int countMicro, int countSmall, int countMedium, int countLarge, int brokerId)
+	// {
+	// 	int vmid = 0;
+	// 	int microMips = (totalMips / 100)* 10;
+	// 	int smallMips = (totalMips / 100)* 20;
+	// 	int mediumMips = (totalMips / 100)* 30;
+	// 	int largeMips = (totalMips / 100)* 40;
+	// 	long size = 10000; // image size (MB)
+	// 	int ram = 512; // vm memory (MB)
+	// 	long bw = 1000;
+	// 	int pesNumber = 1; // number of cpus
+	// 	String vmm = "Xen"; // VMM name
 
 
-		for(int i=0;i<countMicro;i++)
-		{
-			PowerVm vm = new PowerVm(vmid++, brokerId, microMips, pesNumber, ram, bw, size,1, vmm, new CloudletSchedulerTimeShared(),1.0);
+	// 	for(int i=0;i<countMicro;i++)
+	// 	{
+	// 		PowerVm vm = new PowerVm(vmid++, brokerId, microMips, pesNumber, ram, bw, size,1, vmm, new CloudletSchedulerTimeShared(),SCHEDULING_INTERVAL);
 
-			vmlist.add(vm);
-		}
-		for(int i=0;i<countSmall;i++)
-		{
-			PowerVm vm = new PowerVm(vmid++, brokerId, smallMips, pesNumber, ram, bw, size,1, vmm, new CloudletSchedulerTimeShared(),1.0);
+	// 		vmlist.add(vm);
+	// 	}
+	// 	for(int i=0;i<countSmall;i++)
+	// 	{
+	// 		PowerVm vm = new PowerVm(vmid++, brokerId, smallMips, pesNumber, ram, bw, size,1, vmm, new CloudletSchedulerTimeShared(),SCHEDULING_INTERVAL);
 
-			vmlist.add(vm);
-		}
-		for(int i=0;i<countMedium;i++)
-		{
-			PowerVm vm = new PowerVm(vmid++, brokerId, mediumMips, pesNumber, ram, bw, size,1, vmm, new CloudletSchedulerTimeShared(),1.0);
+	// 		vmlist.add(vm);
+	// 	}
+	// 	for(int i=0;i<countMedium;i++)
+	// 	{
+	// 		PowerVm vm = new PowerVm(vmid++, brokerId, mediumMips, pesNumber, ram, bw, size,1, vmm, new CloudletSchedulerTimeShared(),SCHEDULING_INTERVAL);
 
-			vmlist.add(vm);
-		}
-		for(int i=0;i<countLarge;i++)
-		{
-			PowerVm vm = new PowerVm(vmid++, brokerId, largeMips, pesNumber, ram, bw, size,1, vmm, new CloudletSchedulerTimeShared(),1.0);
+	// 		vmlist.add(vm);
+	// 	}
+	// 	for(int i=0;i<countLarge;i++)
+	// 	{
+	// 		PowerVm vm = new PowerVm(vmid++, brokerId, largeMips, pesNumber, ram, bw, size,1, vmm, new CloudletSchedulerTimeShared(),SCHEDULING_INTERVAL);
 
-			vmlist.add(vm);
-		}
+	// 		vmlist.add(vm);
+	// 	}
 
-	}
+	// }
 }
