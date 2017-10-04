@@ -37,6 +37,7 @@ import org.cloudbus.cloudsim.provisioners.BwProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.RamProvisionerSimple;
 import org.cloudbus.cloudsim.power.models.PowerModelLinear;
+import org.cloudbus.cloudsim.power.PowerVmSelectionPolicyMinimumUtilization;
 /**
  * A simple example showing how to create a data center with one host and run one cloudlet on it.
  */
@@ -91,7 +92,7 @@ public class Assignment2 {
 
 			List<PowerHost> hostList = Helper.createHostList(10);
 
-			Datacenter datacenter0 = Helper.createDatacenter("Datacenter_0",PowerDatacenter.class,hostList,new PowerVmAllocationPolicySimple(hostList));
+			Datacenter datacenter0 = Helper.createDatacenter("Datacenter_0",PowerDatacenter.class,hostList,new PowerVmAllocation(hostList,new PowerVmSelectionPolicyMinimumUtilization()));
 
 			// Third step: Create Broker
 			DatacenterBroker broker = Helper.createBroker();
@@ -121,7 +122,7 @@ public class Assignment2 {
 			for(int i=0;i<40;i++)
 			{
 				int id = i;
-				long length = 10000;
+				long length = 1000000;
 				long fileSize = 300;
 				long outputSize = 300;
 				UtilizationModel utilizationModel = new UtilizationModelFull();
