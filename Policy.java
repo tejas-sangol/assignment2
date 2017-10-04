@@ -1,17 +1,28 @@
-public class Policy{
+import java.util.List;
+import java.util.Set;
 
-	private double utilizationThreshold = 0.9;
+import org.cloudbus.cloudsim.Host;
+import org.cloudbus.cloudsim.Vm;
+import org.cloudbus.cloudsim.power.PowerHost;
+import org.cloudbus.cloudsim.power.PowerVmAllocationPolicyMigrationAbstract;
+import org.cloudbus.cloudsim.power.PowerVmSelectionPolicy;
 
+public class Policy extends PowerVmAllocationPolicyMigrationAbstract{
+
+	public Policy(List<? extends Host> hostList, PowerVmSelectionPolicy vmSelectionPolicy) {
+		super(hostList, vmSelectionPolicy);
+		// TODO Auto-generated constructor stub
+	}
 	
 	@Override
 	protected boolean isHostOverUtilized(PowerHost host) {
-		//addHistoryEntry(host, getUtilizationThreshold());
+		addHistoryEntry(host, 0.9);
 		double totalRequestedMips = 0;
 		for (Vm vm : host.getVmList()) {
 			totalRequestedMips += vm.getCurrentRequestedTotalMips();
 		}
 		double utilization = totalRequestedMips / host.getTotalMips();
-		return utilization > 0.9
+		return utilization > 0.9;
 	}
 
 	@Override
