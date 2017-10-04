@@ -1,1 +1,6 @@
-java -cp "./cloudsim-4.0.jar:." Assignment2
+javac -Xlint -cp "./cloudsim-4.0.jar:." Constants.java Assignment2.java PowerVmAllocation.java Helper.java && \
+		
+for((i=20;i<24;i++));
+do
+	java -cp "./cloudsim-4.0.jar:." Assignment2  > out$i &
+done
