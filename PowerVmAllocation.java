@@ -1,5 +1,3 @@
-
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,8 +16,8 @@ import org.cloudbus.cloudsim.power.PowerHost;
 import org.cloudbus.cloudsim.Host;
 import org.cloudbus.cloudsim.util.ExecutionTimeMeasurer;
 import org.cloudbus.cloudsim.power.PowerVmAllocationPolicyMigrationAbstract;
+import org.cloudbus.cloudsim.power.PowerHostUtilizationHistory;
 import org.cloudbus.cloudsim.power.PowerVmSelectionPolicy;
-
 
 class PowerVmAllocation extends PowerVmAllocationPolicyMigrationAbstract{
 
@@ -69,7 +67,7 @@ class PowerVmAllocation extends PowerVmAllocationPolicyMigrationAbstract{
 		}
 		return allocatedHost;
 	}
-
+	
 	@Override
 	protected boolean isHostOverUtilized(PowerHost host) {
 		addHistoryEntry(host, 0.9);
@@ -78,6 +76,41 @@ class PowerVmAllocation extends PowerVmAllocationPolicyMigrationAbstract{
 			totalRequestedMips += vm.getCurrentRequestedTotalMips();
 		}
 		double utilization = totalRequestedMips / host.getTotalMips();
+
 		return utilization > 0.9;
 	}
+
+
+	public int cnt1 = 0;
+	@Override
+	protected List<PowerHostUtilizationHistory> getOverUtilizedHosts() {
+		List<PowerHostUtilizationHistory> overUtilizedHosts = new LinkedList<PowerHostUtilizationHistory>();
+		for (PowerHostUtilizationHistory host : this.<PowerHostUtilizationHistory> getHostList()) {
+			if (isHostOverUtilized(host)) {
+				overUtilizedHosts.add(host);
+			}
+		}
+		cnt1+=overUtilizedHosts.size();
+		return overUtilizedHosts;
+
+	}
+	
+	public int cnt = 0;	
+	/**
+	 * Gets the switched off host.
+	 * 
+	 * @return the switched off host
+	 */
+	@Override
+	protected List<PowerHost> getSwitchedOffHosts() {
+		List<PowerHost> switchedOffHosts = new LinkedList<PowerHost>();
+		for (PowerHost host : this.<PowerHost> getHostList()) {
+			if (host.getUtilizationOfCpu() == 0) {
+				switchedOffHosts.add(host);
+			}
+		}
+		cnt += switchedOffHosts.size();
+		return switchedOffHosts;
+	}
+
 }

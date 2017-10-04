@@ -90,9 +90,9 @@ public class Assignment2 {
 			// Datacenters are the resource providers in CloudSim. We need at
 			// list one of them to run a CloudSim simulation
 
-			List<PowerHost> hostList = Helper.createHostList(10);
-
-			Datacenter datacenter0 = Helper.createDatacenter("Datacenter_0",PowerDatacenter.class,hostList,new PowerVmAllocation(hostList,new PowerVmSelectionPolicyMinimumUtilization()));
+			List<PowerHost> hostList = Helper.createHostList(1000);
+			PowerVmAllocation a = new PowerVmAllocation(hostList,new PowerVmSelectionPolicyMinimumUtilization());
+			Datacenter datacenter0 = Helper.createDatacenter("Datacenter_0",PowerDatacenter.class,hostList,a);
 
 			// Third step: Create Broker
 			DatacenterBroker broker = Helper.createBroker();
@@ -109,7 +109,7 @@ public class Assignment2 {
 			String vmm = "Xen"; // VMM name
 
 			// create 4000 VM and add to the list
-			vmlist = Helper.createVmList(brokerId,40);
+			vmlist = Helper.createVmList(brokerId,4000);
 
 			// submit vm list to the broker
 			broker.submitVmList(vmlist);
@@ -119,10 +119,10 @@ public class Assignment2 {
 
 			// Cloudlet properties
 
-			for(int i=0;i<40;i++)
+			for(int i=0;i<4000;i++)
 			{
 				int id = i;
-				long length = 1000000;
+				long length = 100000*i;
 				long fileSize = 300;
 				long outputSize = 300;
 				UtilizationModel utilizationModel = new UtilizationModelFull();
@@ -150,108 +150,13 @@ public class Assignment2 {
 			//Final step: Print results when simulation is over
 			List<Cloudlet> newList = broker.getCloudletReceivedList();
 			printCloudletList(newList);
-
+			System.out.println("cnt1 is " + a.cnt1);
+			System.out.println("switched off is " + a.cnt);
 			Log.printLine("CloudSimExample1 finished!");
 		} catch (Exception e) {
 			e.printStackTrace();
 			Log.printLine("Unwanted errors happen");
 		}
-	}
-
-	/**
-	 * Creates the datacenter.
-	 *
-	 * @param name the name
-	 *
-	 * @return the datacenter
-	 */
-	private static Datacenter createDatacenter(String name) {
-
-		// Here are the steps needed to create a Datacenter:
-		// 1. We need to create a list to store
-		// our machine
-		List<PowerHost> hostList = new ArrayList<PowerHost>();
-
-		for(int i=0;i<1;i++)
-		{
-			List<Pe> peList = new ArrayList<Pe>();
-
-			int mips = 1000;
-
-			// 3. Create PEs and add these into a list.
-			peList.add(new Pe(i, new PeProvisionerSimple(mips))); 
-
-			int hostId = i;
-			int ram = 2048; // host memory (MB)
-			long storage = 1000000; // host storage
-			int bw = 10000;
-
-			hostList.add(
-			new PowerHost(
-				hostId,
-				new RamProvisionerSimple(ram),
-				new BwProvisionerSimple(bw),
-				storage,
-				peList,
-				new VmSchedulerTimeShared(peList),
-				new PowerModelLinear(10000,0.1)
-			)
-			);
-
-			// System.out.println(hostList.size());
-		}
-		// 2. A Machine contains one or more PEs or CPUs/Cores.
-		// In this example, it will have only one core.
-		
-
-		// 5. Create a DatacenterCharacteristics object that stores the
-		// properties of a data center: architecture, OS, list of
-		// Machines, allocation policy: time- or space-shared, time zone
-		// and its price (G$/Pe time unit).
-		String arch = "x86"; // system architecture
-		String os = "Linux"; // operating system
-		String vmm = "Xen";
-		double time_zone = 10.0; // time zone this resource located
-		double cost = 3.0; // the cost of using processing in this resource
-		double costPerMem = 0.05; // the cost of using memory in this resource
-		double costPerStorage = 0.001; // the cost of using storage in this
-										// resource
-		double costPerBw = 0.0; // the cost of using bw in this resource
-		LinkedList<Storage> storageList = new LinkedList<Storage>(); // we are not adding SAN
-													// devices by now
-
-		DatacenterCharacteristics characteristics = new DatacenterCharacteristics(
-				arch, os, vmm, hostList, time_zone, cost, costPerMem,
-				costPerStorage, costPerBw);
-
-		// 6. Finally, we need to create a Datacenter object.
-		Datacenter datacenter = null;
-		try {
-			datacenter = new Datacenter(name, characteristics, new PowerVmAllocationPolicySimple(hostList), storageList, 0);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return datacenter;
-	}
-
-	// We strongly encourage users to develop their own broker policies, to
-	// submit vms and cloudlets according
-	// to the specific rules of the simulated scenario
-	/**
-	 * Creates the broker.
-	 *
-	 * @return the datacenter broker
-	 */
-	private static DatacenterBroker createBroker() {
-		DatacenterBroker broker = null;
-		try {
-			broker = new DatacenterBroker("Broker");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-		return broker;
 	}
 
 	/**
@@ -288,45 +193,4 @@ public class Assignment2 {
 			}
 		}
 	}
-
-	// private static void generateVms(List<PowerVm> vmlist,int totalMips,int countMicro, int countSmall, int countMedium, int countLarge, int brokerId)
-	// {
-	// 	int vmid = 0;
-	// 	int microMips = (totalMips / 100)* 10;
-	// 	int smallMips = (totalMips / 100)* 20;
-	// 	int mediumMips = (totalMips / 100)* 30;
-	// 	int largeMips = (totalMips / 100)* 40;
-	// 	long size = 10000; // image size (MB)
-	// 	int ram = 512; // vm memory (MB)
-	// 	long bw = 1000;
-	// 	int pesNumber = 1; // number of cpus
-	// 	String vmm = "Xen"; // VMM name
-
-
-	// 	for(int i=0;i<countMicro;i++)
-	// 	{
-	// 		PowerVm vm = new PowerVm(vmid++, brokerId, microMips, pesNumber, ram, bw, size,1, vmm, new CloudletSchedulerTimeShared(),SCHEDULING_INTERVAL);
-
-	// 		vmlist.add(vm);
-	// 	}
-	// 	for(int i=0;i<countSmall;i++)
-	// 	{
-	// 		PowerVm vm = new PowerVm(vmid++, brokerId, smallMips, pesNumber, ram, bw, size,1, vmm, new CloudletSchedulerTimeShared(),SCHEDULING_INTERVAL);
-
-	// 		vmlist.add(vm);
-	// 	}
-	// 	for(int i=0;i<countMedium;i++)
-	// 	{
-	// 		PowerVm vm = new PowerVm(vmid++, brokerId, mediumMips, pesNumber, ram, bw, size,1, vmm, new CloudletSchedulerTimeShared(),SCHEDULING_INTERVAL);
-
-	// 		vmlist.add(vm);
-	// 	}
-	// 	for(int i=0;i<countLarge;i++)
-	// 	{
-	// 		PowerVm vm = new PowerVm(vmid++, brokerId, largeMips, pesNumber, ram, bw, size,1, vmm, new CloudletSchedulerTimeShared(),SCHEDULING_INTERVAL);
-
-	// 		vmlist.add(vm);
-	// 	}
-
-	// }
 }
