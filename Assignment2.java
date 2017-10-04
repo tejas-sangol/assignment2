@@ -18,8 +18,8 @@ import org.cloudbus.cloudsim.Cloudlet;
 import org.cloudbus.cloudsim.CloudletSchedulerTimeShared;
 import org.cloudbus.cloudsim.Datacenter;
 import org.cloudbus.cloudsim.DatacenterBroker;
-// import org.cloudbus.cloudsim.power.Datacenter;
-// import org.cloudbus.cloudsim.power.DatacenterBroker;
+import org.cloudbus.cloudsim.power.PowerDatacenter;
+import org.cloudbus.cloudsim.power.PowerDatacenterBroker;
 import org.cloudbus.cloudsim.DatacenterCharacteristics;
 import org.cloudbus.cloudsim.power.PowerHost;
 import org.cloudbus.cloudsim.Log;
@@ -91,7 +91,7 @@ public class Assignment2 {
 
 			List<PowerHost> hostList = Helper.createHostList(10);
 
-			Datacenter datacenter0 = Helper.createDatacenter("Datacenter_0",Datacenter.class,hostList,new PowerVmAllocationPolicySimple(hostList));
+			Datacenter datacenter0 = Helper.createDatacenter("Datacenter_0",PowerDatacenter.class,hostList,new PowerVmAllocationPolicySimple(hostList));
 
 			// Third step: Create Broker
 			DatacenterBroker broker = Helper.createBroker();
@@ -108,7 +108,7 @@ public class Assignment2 {
 			String vmm = "Xen"; // VMM name
 
 			// create 4000 VM and add to the list
-			vmlist = Helper.createVmList(brokerId,1);
+			vmlist = Helper.createVmList(brokerId,40);
 
 			// submit vm list to the broker
 			broker.submitVmList(vmlist);
@@ -117,21 +117,26 @@ public class Assignment2 {
 			cloudletList = new ArrayList<Cloudlet>();
 
 			// Cloudlet properties
-			int id = 0;
-			long length = 4000000;
-			long fileSize = 300;
-			long outputSize = 300;
-			UtilizationModel utilizationModel = new UtilizationModelFull();
 
-			Cloudlet cloudlet = 
-                                new Cloudlet(id, length, pesNumber, fileSize, 
-                                        outputSize, utilizationModel, utilizationModel, 
-                                        utilizationModel);
-			cloudlet.setUserId(brokerId);
-			cloudlet.setVmId(vmid);
+			for(int i=0;i<40;i++)
+			{
+				int id = i;
+				long length = 10000;
+				long fileSize = 300;
+				long outputSize = 300;
+				UtilizationModel utilizationModel = new UtilizationModelFull();
 
-			// add the cloudlet to the list
-			cloudletList.add(cloudlet);
+				Cloudlet cloudlet = 
+	                                new Cloudlet(id, length, pesNumber, fileSize, 
+	                                        outputSize, utilizationModel, utilizationModel, 
+	                                        utilizationModel);
+				cloudlet.setUserId(brokerId);
+				cloudlet.setVmId(i);
+
+				// add the cloudlet to the list
+				cloudletList.add(cloudlet);
+			}
+			
 
 			// submit cloudlet list to the broker
 			broker.submitCloudletList(cloudletList);
